@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ccf7929b-8198-4452-ad60-e02285ac8149",
+  "id": "891041fb-3c81-46b0-ac5a-cd85a640fe8c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "repositories": {
@@ -44,6 +44,13 @@
         },
         "stars": {
           "name": "stars",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "forks": {
+          "name": "forks",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,

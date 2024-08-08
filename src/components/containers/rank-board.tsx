@@ -9,15 +9,17 @@ type RankBoardProps = {
   avatar: string;
   points: number;
   rank: number;
+  onClick?: () => void;
 };
 
-const RankBoard = ({ name, avatar, points, rank }: RankBoardProps) => {
+const RankBoard = ({ name, avatar, points, rank, onClick }: RankBoardProps) => {
   return (
     <button
       type="button"
       className={cn(
         "flex flex-col items-center rounded-lg py-4 hover:bg-neutral/70 active:scale-x-105 transition-all relative"
       )}
+      onClick={onClick}
     >
       {rank === 1 ? (
         <>

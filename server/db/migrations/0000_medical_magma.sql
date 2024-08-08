@@ -5,6 +5,7 @@ CREATE TABLE `repositories` (
 	`uri` text NOT NULL,
 	`language` text NOT NULL,
 	`stars` integer NOT NULL,
+	`forks` integer NOT NULL,
 	`last_update` text NOT NULL,
 	`languages` text,
 	`contributors` text,

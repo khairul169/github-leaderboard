@@ -13,6 +13,8 @@ import {
 import { useMemo } from "react";
 import { dummyAvatar } from "@client/lib/utils";
 import { onLogin, useAuth } from "@client/hooks/useAuth";
+import ViewSheet from "./view-sheet";
+import { setHashUrl } from "@client/hooks/useHashUrl";
 
 const HomePage = () => {
   const { user } = useAuth();
@@ -49,6 +51,7 @@ const HomePage = () => {
                 name={item.name}
                 avatar={item.avatar || dummyAvatar(item.rank)}
                 points={item.points}
+                onClick={() => setHashUrl(item.username)}
               />
             );
           })}
@@ -65,6 +68,7 @@ const HomePage = () => {
             name={item.name}
             avatar={item.avatar || dummyAvatar(item.rank)}
             points={item.points}
+            onClick={() => setHashUrl(item.username)}
           />
         ))}
 
@@ -77,6 +81,7 @@ const HomePage = () => {
               avatar={userRank.user.avatar || dummyAvatar(userRank.user.rank)}
               points={userRank.user.points}
               className="sticky z-[2] bottom-0 bg-base-100"
+              onClick={() => setHashUrl(userRank.user.username)}
             />
           </>
         ) : (
@@ -96,6 +101,8 @@ const HomePage = () => {
           </div>
         )}
       </section>
+
+      <ViewSheet />
     </div>
   );
 };

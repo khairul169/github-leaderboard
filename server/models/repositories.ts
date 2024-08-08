@@ -15,7 +15,7 @@ export const repositories = sqliteTable(
     uri: text("uri").notNull(),
     language: text("language").notNull(),
     stars: integer("stars").notNull(),
-    forks: integer("stars").notNull(),
+    forks: integer("forks").notNull(),
     lastUpdate: text("last_update").notNull(),
     languages: text("languages", { mode: "json" }).$type<Language[]>(),
     contributors: text("contributors", { mode: "json" }).$type<Contributor[]>(),

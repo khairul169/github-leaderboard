@@ -7,6 +7,7 @@ type RankListItemProps = {
   points: number;
   rank: number;
   className?: string;
+  onClick?: () => void;
 };
 
 const RankListItem = ({
@@ -15,6 +16,7 @@ const RankListItem = ({
   points,
   rank,
   className,
+  onClick,
 }: RankListItemProps) => {
   return (
     <button
@@ -24,6 +26,7 @@ const RankListItem = ({
         rank % 2 === 0 && "bg-base-100/50",
         className
       )}
+      onClick={onClick}
     >
       <div className="w-10">
         <Badge
