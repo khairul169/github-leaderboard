@@ -1,25 +1,21 @@
 import Appbar from "@client/components/containers/appbar";
-import RankBoard from "@client/components/containers/rank-board";
-import RankListItem, {
-  RankListHeader,
-} from "@client/components/containers/rank-list-item";
-import { Button } from "react-daisyui";
-import { FaGithub } from "react-icons/fa";
-import {
-  LeaderboardEntry,
-  useGetUserLeaderboard,
-  useLeaderboard,
-} from "./hooks";
+import RankBoard from "@client/pages/home/components/rank-board";
+import { LeaderboardEntry, useLeaderboard, useLeaderboardType } from "./hooks";
 import { useMemo } from "react";
-import { dummyAvatar } from "@client/lib/utils";
-import { onLogin, useAuth } from "@client/hooks/useAuth";
-import ViewSheet from "./view-sheet";
-import { setHashUrl } from "@client/hooks/useHashUrl";
+import TypeTabs from "./components/type-tabs";
+import ViewSheet from "./components/view-sheet";
+import RankListItem, { RankListHeader } from "./components/rank-list-item";
+import { useNavigate } from "react-router-dom";
+import UserRank from "./components/user-rank";
 
 const HomePage = () => {
-  const { user } = useAuth();
-  const { data } = useLeaderboard();
-  const { data: userRank } = useGetUserLeaderboard(user?.username);
+  const [type, { query }] = useLeaderboardType();
+  const { data } = useLeaderboard({ type, ...query });
+  const navigate = useNavigate();
+
+  const onView = (username: string) => {
+    navigate(`/${type}/${username}`);
+  };
 
   const topLeaderboard = useMemo(() => {
     const res = new Array(3).fill(null) as LeaderboardEntry[];
@@ -27,18 +23,19 @@ const HomePage = () => {
       return res;
     }
 
-    res[1] = data[0];
-    res[0] = data[1];
-    res[2] = data[2];
+    res[1] = data.rows[0];
+    res[0] = data.rows[1];
+    res[2] = data.rows[2];
     return res;
   }, [data]);
 
   return (
     <div>
       <section className="bg-base-100 rounded-b-xl rounded-t-0 p-4 md:rounded-t-lg md:rounded-b-lg shadow-lg relative z-[1]">
-        <Appbar title="Antrian Kick IMPHNEN" />
+        <Appbar title="Top Global Ranked Github" />
+        <TypeTabs />
 
-        <div className="grid grid-cols-3 items-end">
+        <div className="grid grid-cols-3 items-end mt-8 mb-4">
           {topLeaderboard.map((item, idx) => {
             if (!item) {
               return <div key={idx} />;
@@ -49,9 +46,9 @@ const HomePage = () => {
                 key={item.name}
                 rank={item.rank}
                 name={item.name}
-                avatar={item.avatar || dummyAvatar(item.rank)}
-                points={item.points}
-                onClick={() => setHashUrl(item.username)}
+                avatar={item.image}
+                sub={item.sub}
+                onClick={type === "user" ? () => onView(item.id!) : undefined}
               />
             );
           })}
@@ -59,47 +56,23 @@ const HomePage = () => {
       </section>
 
       <section className="bg-base-300 rounded-b-lg py-4 shadow-lg -mt-4">
-        <RankListHeader />
-
-        {data?.slice(3).map((item) => (
-          <RankListItem
-            key={item.id}
-            rank={item.rank}
-            name={item.name}
-            avatar={item.avatar || dummyAvatar(item.rank)}
-            points={item.points}
-            onClick={() => setHashUrl(item.username)}
-          />
-        ))}
-
-        {userRank != null ? (
+        {data?.rows && data.rows.length > 3 ? (
           <>
-            <p className="text-sm text-base-content/80 mx-4 my-2">Kamu:</p>
-            <RankListItem
-              rank={userRank.user.rank}
-              name={userRank.user.name}
-              avatar={userRank.user.avatar || dummyAvatar(userRank.user.rank)}
-              points={userRank.user.points}
-              className="sticky z-[2] bottom-0 bg-base-100"
-              onClick={() => setHashUrl(userRank.user.username)}
-            />
+            <RankListHeader columns={data.columns} />
+
+            {data.rows.slice(3).map((item) => (
+              <RankListItem
+                key={item.id}
+                rank={item.rank}
+                columns={data.columns}
+                data={item}
+                onClick={type === "user" ? () => onView(item.id!) : undefined}
+              />
+            ))}
           </>
-        ) : (
-          <div className="bg-base-100 mx-4 rounded-lg px-6 py-4 sticky bottom-4 z-[2]">
-            <p>Pengen nama kamu masuk list ini juga?</p>
-            <p className="inline">Hayuk</p>
-            <Button
-              size="sm"
-              color="primary"
-              className="mx-2"
-              onClick={onLogin}
-            >
-              <FaGithub />
-              <p>Login</p>
-            </Button>
-            <p className="inline">{"⸜(｡˃ ᵕ ˂ )⸝♡"}</p>
-          </div>
-        )}
+        ) : null}
+
+        <UserRank />
       </section>
 
       <ViewSheet />

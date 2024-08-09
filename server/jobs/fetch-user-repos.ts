@@ -28,6 +28,7 @@ export const fetchUserRepos = async (data: FetchUserRepos) => {
         ...repo,
         userId: user.id,
         lastUpdate: repo.lastUpdate.toISOString(),
+        isPending: true,
       };
 
       const [existing] = await tx

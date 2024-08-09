@@ -30,10 +30,6 @@ const github = {
     const $ = cheerio.load(response);
 
     const name = $(selectors.user.name).text().trim();
-    if (typeof name !== "string" || !name?.length) {
-      throw new Error("User not found");
-    }
-
     const location = $(selectors.user.location).text().trim();
     const followers = intval($(selectors.user.followers).text().trim());
     const following = intval($(selectors.user.following).text().trim());
@@ -45,7 +41,14 @@ const github = {
       achievements.push({ name, image });
     });
 
-    return { name, username, location, followers, following, achievements };
+    return {
+      name: name || username,
+      username,
+      location,
+      followers,
+      following,
+      achievements,
+    };
   },
 
   async getRepositories(

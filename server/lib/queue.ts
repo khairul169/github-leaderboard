@@ -6,7 +6,7 @@ import type { JobNames } from "@server/jobs";
 const queue = new Queue<any, any, JobNames>(BULLMQ_JOB_NAME, {
   connection: BULLMQ_CONNECTION,
   defaultJobOptions: {
-    attempts: 5,
+    attempts: 3,
     backoff: {
       type: "exponential",
       delay: 3000,

@@ -2,7 +2,7 @@ import db from "@server/db";
 import { JWT_SECRET } from "@server/lib/consts";
 import github from "@server/lib/github";
 import queue from "@server/lib/queue";
-import { repositories, users } from "@server/models";
+import { users } from "@server/models";
 import { CreateUser } from "@server/models/users";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
@@ -50,7 +50,7 @@ export const auth = new Hono()
 
     const userData: CreateUser = {
       username: ghUser.login,
-      name: ghUser.name,
+      name: ghUser.name || ghUser.login,
       avatar: ghUser.avatar_url,
       location: ghUser.location,
       accessToken,
@@ -73,18 +73,16 @@ export const auth = new Hono()
     }
 
     // Fetch latest user profile
-    await queue.add("fetchUserProfile", { userId: user.id });
-
-    // Fetch user repositories
-    const [hasRepo] = await db
-      .select({ id: repositories.id })
-      .from(repositories)
-      .where(eq(repositories.userId, user.id))
-      .limit(1);
-
-    if (!hasRepo) {
-      await queue.add("fetchUserRepos", { userId: user.id });
-    }
+    await queue.add(
+      "fetchUserProfile",
+      { userId: user.id },
+      { jobId: `fetchUserProfile:${user.id}` }
+    );
+    await queue.add(
+      "fetchUserRepos",
+      { userId: user.id },
+      { jobId: `fetchUserRepos:${user.id}` }
+    );
 
     const authToken = await jwt.sign({ id: user.id }, JWT_SECRET);
     setCookie(c, "token", authToken, { httpOnly: true });

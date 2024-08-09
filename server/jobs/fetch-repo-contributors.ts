@@ -34,7 +34,7 @@ export const fetchRepoContributors = async (
 
   const [result] = await db
     .update(repositories)
-    .set({ contributors })
+    .set({ contributors, isPending: false, isError: false })
     .where(eq(repositories.id, data.id))
     .returning();
 
@@ -43,4 +43,13 @@ export const fetchRepoContributors = async (
   }
 
   await queue.add("calculateUserPoints", { userId: result.userId });
+};
+
+export const onFetchRepoContribFailed = async (
+  data: FetchRepoContributorsType
+) => {
+  await db
+    .update(repositories)
+    .set({ isPending: false, isError: true })
+    .where(eq(repositories.id, data.id));
 };

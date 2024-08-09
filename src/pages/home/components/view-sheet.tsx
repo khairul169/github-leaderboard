@@ -2,19 +2,39 @@ import BottomSheet, {
   BottomSheetDescription,
   BottomSheetTitle,
 } from "@client/components/ui/bottom-sheet";
-import { setHashUrl, useHashUrl } from "@client/hooks/useHashUrl";
-import { memo, useMemo } from "react";
-import { Avatar, Badge } from "react-daisyui";
-import { useGetUserLeaderboard } from "./hooks";
+import { memo, useEffect, useMemo } from "react";
+import { Avatar, Badge, Card, Progress } from "react-daisyui";
+import { useGetUserLeaderboard } from "../hooks";
 import { dummyAvatar } from "@client/lib/utils";
-import { FiType, FiUsers } from "react-icons/fi";
+import { FiGitMerge, FiStar, FiType, FiUsers } from "react-icons/fi";
 import { FaCode, FaRegStar, FaTrophy } from "react-icons/fa";
 import { LuFolderGit } from "react-icons/lu";
 import { IoMdGitBranch, IoMdGitCommit } from "react-icons/io";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ViewSheet = () => {
-  const username = useHashUrl();
-  const { data } = useGetUserLeaderboard(username);
+  const { type, id } = useParams();
+  const username = type === "user" ? id : null;
+  const { data, refetch } = useGetUserLeaderboard(username);
+  const navigate = useNavigate();
+
+  const totalRepo = useMemo(() => {
+    return data?.repositories.length || 0;
+  }, [data]);
+  const pendingRepos = useMemo(() => {
+    return data?.repositories.filter((i) => i.isPending).length || 0;
+  }, [data]);
+
+  console.log({ pendingRepos, totalRepo });
+
+  useEffect(() => {
+    if (!pendingRepos) {
+      return;
+    }
+
+    const interval = setInterval(refetch, 3000);
+    return () => clearInterval(interval);
+  }, [pendingRepos]);
 
   const summary = useMemo(() => {
     if (!data) {
@@ -25,7 +45,7 @@ const ViewSheet = () => {
       {
         icon: LuFolderGit,
         name: "Personal repo",
-        value: data.repositories.length,
+        value: totalRepo,
       },
       {
         icon: FaRegStar,
@@ -44,7 +64,7 @@ const ViewSheet = () => {
       },
       {
         icon: FiType,
-        name: "Line of codes",
+        name: "Lines of code",
         value: data.user.lineOfCodes,
       },
       {
@@ -53,13 +73,23 @@ const ViewSheet = () => {
         value: data.languages.length,
       },
     ];
+  }, [data, totalRepo]);
+
+  const achievements = useMemo(() => {
+    const items: Record<string, { name: string; image?: string }> = {};
+
+    data?.user.achievements?.forEach((item) => {
+      items[item.name] = item;
+    });
+
+    return Object.values(items);
   }, [data]);
 
   return (
     <BottomSheet
       open={!!username}
       onOpenChange={(open) => {
-        if (!open) setHashUrl("");
+        if (!open) navigate("/user", { replace: true });
       }}
       className="h-[90%]"
     >
@@ -93,6 +123,32 @@ const ViewSheet = () => {
             <p className="text-xs">{data?.user.points + " pts"}</p>
           </div>
         </div>
+
+        {data && pendingRepos > 0 && (
+          <Card compact className="mt-4 md:mt-8 bg-base-300">
+            <Card.Body>
+              <Card.Title className="text-sm font-normal">
+                Mengimport data repositori, mohon tunggu...
+              </Card.Title>
+              <Progress
+                max={100}
+                value={((totalRepo - pendingRepos) / totalRepo) * 100}
+              />
+            </Card.Body>
+          </Card>
+        )}
+
+        {achievements.length > 0 && (
+          <section id="achievements" className="mt-4 md:mt-8">
+            <div className="flex flex-row sm:flex-wrap overflow-x-auto sm:overflow-hidden gap-2">
+              {achievements.map((item) => (
+                <div key={item.name} className="size-12 shrink-0">
+                  <img src={item.image} title={item.name} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {data?.languages && data.languages.length > 0 && (
           <section id="languages" className="mt-4 md:mt-8">
@@ -130,6 +186,34 @@ const ViewSheet = () => {
               </div>
             </div>
           ))}
+        </section>
+
+        <section className="mt-8 grid">
+          <p>Top Repositori</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+            {data?.repositories.slice(0, 3).map((item, idx) => (
+              <a
+                href={`https://github.com/${username}/${item.name}`}
+                target="_blank"
+                key={idx}
+                className="rounded-xl px-4 py-3 bg-base-300 hover:bg-base-200 transition-all border border-base-content/50"
+              >
+                <LuFolderGit size={18} />
+                <div className="flex-1 truncate">
+                  <p className="mt-1 truncate">{item.name}</p>
+                  <p className="text-xs truncate mt-0.5 text-base-content/80">
+                    {item.languages?.map((i) => i.lang).join(", ") ||
+                      item.language}
+                  </p>
+
+                  <p className="flex flex-wrap items-center gap-1 text-xs mt-4">
+                    <FiStar size={18} /> {item.stars}
+                    <FiGitMerge size={18} className="ml-2" /> {item.forks}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
         </section>
       </div>
     </BottomSheet>

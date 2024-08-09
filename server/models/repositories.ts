@@ -20,6 +20,11 @@ export const repositories = sqliteTable(
     languages: text("languages", { mode: "json" }).$type<Language[]>(),
     contributors: text("contributors", { mode: "json" }).$type<Contributor[]>(),
 
+    isPending: integer("is_pending", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    isError: integer("is_error", { mode: "boolean" }).notNull().default(false),
+
     createdAt: text("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),

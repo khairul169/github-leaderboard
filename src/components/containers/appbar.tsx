@@ -16,7 +16,7 @@ const Appbar = ({ title }: AppbarProps) => {
 
       {title ? (
         <h1 className="text-lg md:text-xl text-center flex-1 truncate">
-          Antrian Kick IMPHNEN
+          {title}
         </h1>
       ) : (
         <div className="flex-1" />

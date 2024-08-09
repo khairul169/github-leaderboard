@@ -9,6 +9,8 @@ CREATE TABLE `repositories` (
 	`last_update` text NOT NULL,
 	`languages` text,
 	`contributors` text,
+	`is_pending` integer DEFAULT false NOT NULL,
+	`is_error` integer DEFAULT false NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action

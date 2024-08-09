@@ -46,6 +46,7 @@ export const useFetch = <T = any>(
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Unknown error"));
+      setData(undefined);
     } finally {
       loadingRef.current = false;
       setIsLoading(false);

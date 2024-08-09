@@ -3,7 +3,6 @@ import db from ".";
 import logger from "../lib/logger";
 import { sql } from "drizzle-orm";
 import { faker } from "@faker-js/faker";
-import queue from "@server/lib/queue";
 
 const seed = async () => {
   logger.info("🌿 Seeding database...");
@@ -11,9 +10,9 @@ const seed = async () => {
   await db.transaction(async (tx) => {
     tx.run(sql`DELETE FROM users`);
 
-    await tx
-      .insert(users)
-      .values({ username: "khairul169", name: "Khairul Hidayat" });
+    // await tx
+    //   .insert(users)
+    //   .values({ username: "khairul169", name: "Khairul Hidayat" });
 
     await tx.insert(users).values(
       [...Array(50)].map(() => ({
@@ -28,8 +27,6 @@ const seed = async () => {
       }))
     );
   });
-
-  await queue.add("fetchUserProfile", { userId: 1 });
 
   logger.info("🌱 Database seeded");
 

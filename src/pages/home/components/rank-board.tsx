@@ -1,29 +1,31 @@
-import { cn } from "@client/lib/utils";
-import { Avatar, Badge } from "react-daisyui";
+import { cn, dummyAvatar } from "@client/lib/utils";
+import { Badge } from "react-daisyui";
 import { FaTrophy } from "react-icons/fa";
 import Lottie from "react-lottie";
 import starsAnimation from "@client/assets/stars-animation.json";
 
 type RankBoardProps = {
   name: string;
-  avatar: string;
-  points: number;
+  avatar?: string | null;
+  sub: string;
   rank: number;
   onClick?: () => void;
 };
 
-const RankBoard = ({ name, avatar, points, rank, onClick }: RankBoardProps) => {
+const RankBoard = ({ name, avatar, sub, rank, onClick }: RankBoardProps) => {
   return (
     <button
       type="button"
       className={cn(
-        "flex flex-col items-center rounded-lg py-4 hover:bg-neutral/70 active:scale-x-105 transition-all relative"
+        "flex flex-col items-center rounded-lg py-4 transition-all relative cursor-default",
+        onClick != null &&
+          "hover:bg-neutral/70 active:scale-x-105 cursor-pointer"
       )}
       onClick={onClick}
     >
       {rank === 1 ? (
         <>
-          <div className="absolute z-0 top-1/2 -translate-y-1/2 scale-150 left-0 pointer-events-none">
+          <div className="absolute z-0 top-1/2 -translate-y-1/2 scale-125 left-0 pointer-events-none">
             <Lottie
               options={{
                 animationData: starsAnimation,
@@ -43,15 +45,19 @@ const RankBoard = ({ name, avatar, points, rank, onClick }: RankBoardProps) => {
         <Badge color="primary">{rank}</Badge>
       )}
 
-      <Avatar
-        src={avatar}
-        size={rank === 1 ? 96 : 64}
-        className="mt-4"
-        border
-        shape="circle"
-      />
+      <div
+        className={cn(
+          "mt-4 z-[1] size-[64px] rounded-full overflow-hidden bg-base-300 ring-4 ring-neutral ring-offset-2",
+          rank === 1 && "size-[96px]"
+        )}
+      >
+        <img
+          src={avatar || dummyAvatar(rank)}
+          className={cn("size-[64px] scale-110", rank === 1 && "size-[96px]")}
+        />
+      </div>
       <p className="mt-4 text-sm">{name}</p>
-      <p className="text-xs mt-0.5 text-base-content/80">{`${points} poin`}</p>
+      <p className="text-xs mt-0.5 text-base-content/80">{sub}</p>
     </button>
   );
 };
