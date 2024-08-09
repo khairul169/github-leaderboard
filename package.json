@@ -15,7 +15,7 @@
     "db:push": "drizzle-kit push --config server/drizzle.config.ts",
     "db:seed": "bun run server/db/seed.ts",
     "dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
-    "build": "npm run client:build && npm run server:build",
+    "build": "npm run client:build",
     "start": "NODE_ENV=production bun run server/main.ts",
     "start:worker": "NODE_ENV=production bun run server/queue-worker.ts"
   },

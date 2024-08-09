@@ -11,10 +11,6 @@ export default defineConfig({
       "@server": path.resolve(__dirname, "./server"),
     },
   },
-  build: {
-    outDir: "dist/client",
-    emptyOutDir: true,
-  },
   server: {
     proxy: {
       "/api": process.env.API_BASEURL || "http://127.0.0.1:5589",

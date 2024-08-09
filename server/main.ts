@@ -19,19 +19,26 @@ app.onError((err, c) => {
 // Allow all origin on development
 if (__DEV) {
   app.use(cors({ origin: "*" }));
+} else {
+  app.use(httpLogger());
 }
 
 // Health check
 app.get("/health", (c) => c.text("OK"));
 
-// Serve prod client app
-if (__PROD) {
-  app.use(httpLogger());
-  app.use(serveStatic({ root: "./dist/client" }));
-}
-
 // API router
 app.route("/api", router);
+
+// Serve prod client app
+if (__PROD) {
+  const CLIENT_DIST_DIR = "./dist";
+  app.use(serveStatic({ root: CLIENT_DIST_DIR }));
+  app.get("*", async (c) => {
+    const index = Bun.file(CLIENT_DIST_DIR + "/index.html");
+    const content = await index.text();
+    return c.html(content);
+  });
+}
 
 Bun.serve({
   fetch: app.fetch,
