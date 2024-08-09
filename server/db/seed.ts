@@ -8,7 +8,7 @@ const seed = async () => {
   logger.info("🌿 Seeding database...");
 
   await db.transaction(async (tx) => {
-    tx.run(sql`DELETE FROM users`);
+    await tx.execute(sql`TRUNCATE users`);
 
     // await tx
     //   .insert(users)
