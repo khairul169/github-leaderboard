@@ -26,8 +26,8 @@ const selectors = {
 };
 
 const github = {
-  async getUser(username: string) {
-    const response = await this.fetch(username);
+  async getUser(username: string, options?: Partial<FetchOptions>) {
+    const response = await this.fetch(username, options);
     const $ = cheerio.load(response);
 
     const name = $(selectors.user.name).text().trim();
@@ -43,13 +43,21 @@ const github = {
       achievements.push({ name, image });
     });
 
+    const user = await github.fetch(`users/${username}`, {
+      ghApi: true,
+      headers: {
+        accept: "application/json",
+        ...(options?.headers || {}),
+      },
+    });
+
     return {
       name: name || username,
       avatar,
       username,
       location,
-      followers,
-      following,
+      followers: user.followers || followers,
+      following: user.following || following,
       achievements,
     };
   },

@@ -13,7 +13,13 @@ export const fetchUserProfile = async (data: FetchUserProfileType) => {
   if (!user) {
     throw new Error("User not found!");
   }
-  const details = await github.getUser(user.username);
+
+  const accessToken = user.accessToken || import.meta.env.GITHUB_DEFAULT_TOKEN;
+  const details = await github.getUser(user.username, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   await db
     .update(users)
