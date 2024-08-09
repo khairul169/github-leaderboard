@@ -15,7 +15,7 @@ import { pointWeights } from "../data";
 
 const ViewSheet = () => {
   const { type, id } = useParams();
-  const username = type === "user" ? id : null;
+  const username = type !== "lang" ? id : null;
   const { data, refetch } = useGetUserLeaderboard(username);
   const navigate = useNavigate();
 
@@ -88,7 +88,7 @@ const ViewSheet = () => {
     <BottomSheet
       open={!!username}
       onOpenChange={(open) => {
-        if (!open) navigate("/user", { replace: true });
+        if (!open) navigate(`/${type}`, { replace: true });
       }}
       className="h-[90%]"
     >

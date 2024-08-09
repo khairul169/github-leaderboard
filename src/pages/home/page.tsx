@@ -48,7 +48,7 @@ const HomePage = () => {
                 name={item.name}
                 avatar={item.image}
                 sub={item.sub}
-                onClick={type === "user" ? () => onView(item.id!) : undefined}
+                onClick={type !== "lang" ? () => onView(item.id!) : undefined}
               />
             );
           })}
@@ -66,7 +66,7 @@ const HomePage = () => {
                 rank={item.rank}
                 columns={data.columns}
                 data={item}
-                onClick={type === "user" ? () => onView(item.id!) : undefined}
+                onClick={type !== "lang" ? () => onView(item.id!) : undefined}
               />
             ))}
           </>
