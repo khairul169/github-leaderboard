@@ -22,7 +22,7 @@ const onJobRetriesExhausted = async (job: Job) => {
 
 const worker = new Worker(BULLMQ_JOB_NAME, handler, {
   connection: BULLMQ_CONNECTION,
-  concurrency: Number(import.meta.env.QUEUE_CONCURRENCY) || 1,
+  concurrency: Number(import.meta.env.QUEUE_CONCURRENCY) || 10,
   removeOnComplete: { count: 0 },
   removeOnFail: { count: 0 },
 });

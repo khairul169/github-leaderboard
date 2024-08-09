@@ -37,15 +37,15 @@ export const calculateUserPoints = async (data: CalculateUserPointsType) => {
     : 0;
 
   // User repositories
-  const repos = await db
-    .select()
-    .from(repositories)
-    .where(eq(repositories.userId, user.id));
+  const repos = await db.query.repositories.findMany({
+    where: eq(repositories.userId, user.id),
+    with: { languages: true },
+  });
   points += repos.length * weights.repositories;
 
   // Languages known
   const languages = new Set(
-    repos.flatMap((i) => i.languages?.map((j) => j.lang))
+    repos.flatMap((i) => i.languages?.map((j) => j.name))
   );
   points += languages.size * weights.languagesKnown;
 

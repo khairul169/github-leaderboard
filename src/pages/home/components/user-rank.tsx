@@ -22,7 +22,7 @@ const UserRank = () => {
 
   if (!data) {
     return (
-      <div className="bg-base-100 mx-4 rounded-lg px-6 py-4 sticky bottom-4 z-[2]">
+      <div className="bg-base-100 mx-4 mt-4 rounded-lg px-6 py-4 sticky bottom-4 z-[2]">
         <p>Pengen nama kamu masuk list ini juga?</p>
         <p className="inline">Hayuk</p>
         <Button size="sm" color="primary" className="mx-2" onClick={onLogin}>

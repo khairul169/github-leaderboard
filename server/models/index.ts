@@ -1,2 +1,3 @@
 export { users } from "./users";
-export { repositories } from "./repositories";
+export { repositories, repositoriesRelations } from "./repositories";
+export { repoLanguages, repoLanguagesRelations } from "./repo-languages";

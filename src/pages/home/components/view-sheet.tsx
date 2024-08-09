@@ -3,7 +3,7 @@ import BottomSheet, {
   BottomSheetTitle,
 } from "@client/components/ui/bottom-sheet";
 import { memo, useEffect, useMemo } from "react";
-import { Avatar, Badge, Card, Progress } from "react-daisyui";
+import { Avatar, Badge, Card, Dropdown, Progress } from "react-daisyui";
 import { useGetUserLeaderboard } from "../hooks";
 import { dummyAvatar } from "@client/lib/utils";
 import { FiGitMerge, FiStar, FiType, FiUsers } from "react-icons/fi";
@@ -11,6 +11,7 @@ import { FaCode, FaRegStar, FaTrophy } from "react-icons/fa";
 import { LuFolderGit } from "react-icons/lu";
 import { IoMdGitBranch, IoMdGitCommit } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
+import { pointWeights } from "../data";
 
 const ViewSheet = () => {
   const { type, id } = useParams();
@@ -24,8 +25,6 @@ const ViewSheet = () => {
   const pendingRepos = useMemo(() => {
     return data?.repositories.filter((i) => i.isPending).length || 0;
   }, [data]);
-
-  console.log({ pendingRepos, totalRepo });
 
   useEffect(() => {
     if (!pendingRepos) {
@@ -115,13 +114,40 @@ const ViewSheet = () => {
             </p>
           </div>
 
-          <div className="bg-neutral text-neutral-content px-6 py-3 w-full md:w-auto rounded-lg">
-            <div className="flex flex-row items-center justify-center font-mono gap-2 text-4xl md:text-3xl text-primary">
-              <FaTrophy size={24} />
-              <p>{data?.user.rank}</p>
-            </div>
-            <p className="text-xs">{data?.user.points + " pts"}</p>
-          </div>
+          <Dropdown className="dropdown-end w-full md:w-auto">
+            <Dropdown.Toggle button={false}>
+              <button className="bg-neutral hover:bg-neutral/80 active:opacity-50 text-neutral-content px-6 py-3 w-full rounded-lg">
+                <div className="flex flex-row items-center justify-center font-mono gap-2 text-4xl md:text-3xl text-primary">
+                  <FaTrophy size={24} />
+                  <p>{data?.user.rank}</p>
+                </div>
+                <p className="text-xs">{data?.user.points + " pts"}</p>
+              </button>
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="card card-compact w-64 p-2 z-10 shadow-lg bg-base-300 text-base-content my-2 text-left">
+              <Card.Body>
+                <Card.Title tag="h3" className="text-base">
+                  Perhitungan Point
+                </Card.Title>
+
+                <pre className="font-mono whitespace-break-spaces">
+                  {JSON.stringify(pointWeights, null, 2)}
+                </pre>
+
+                <p>
+                  Cek lebih lengkap{" "}
+                  <a
+                    href="https://github.com/khairul169/github-leaderboard/blob/main/server/jobs/calculate-user-points.ts"
+                    target="_blank"
+                    className="link"
+                  >
+                    disini
+                  </a>
+                  .
+                </p>
+              </Card.Body>
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
 
         {data && pendingRepos > 0 && (
@@ -202,7 +228,7 @@ const ViewSheet = () => {
                 <div className="flex-1 truncate">
                   <p className="mt-1 truncate">{item.name}</p>
                   <p className="text-xs truncate mt-0.5 text-base-content/80">
-                    {item.languages?.map((i) => i.lang).join(", ") ||
+                    {item.languages?.map((i) => i.name).join(", ") ||
                       item.language}
                   </p>
 

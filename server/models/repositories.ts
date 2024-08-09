@@ -1,7 +1,13 @@
-import { Contributor, Language } from "@server/lib/github";
-import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
+import { Contributor } from "@server/lib/github";
+import {
+  InferInsertModel,
+  InferSelectModel,
+  relations,
+  sql,
+} from "drizzle-orm";
 import { text, sqliteTable, integer, index } from "drizzle-orm/sqlite-core";
 import { users } from "./users";
+import { repoLanguages } from "./repo-languages";
 
 export const repositories = sqliteTable(
   "repositories",
@@ -17,7 +23,6 @@ export const repositories = sqliteTable(
     stars: integer("stars").notNull(),
     forks: integer("forks").notNull(),
     lastUpdate: text("last_update").notNull(),
-    languages: text("languages", { mode: "json" }).$type<Language[]>(),
     contributors: text("contributors", { mode: "json" }).$type<Contributor[]>(),
 
     isPending: integer("is_pending", { mode: "boolean" })
@@ -38,6 +43,10 @@ export const repositories = sqliteTable(
     language: index("repositories_language_idx").on(t.language),
   })
 );
+
+export const repositoriesRelations = relations(repositories, ({ many }) => ({
+  languages: many(repoLanguages),
+}));
 
 export type Repository = InferSelectModel<typeof repositories>;
 export type CreateRepository = InferInsertModel<typeof repositories>;

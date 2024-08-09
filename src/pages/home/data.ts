@@ -28,3 +28,16 @@ export type LeaderboardType = {
   value: LeaderboardTypes;
   query?: any;
 };
+
+export const pointWeights = {
+  followers: 20,
+  following: 10,
+  achievements: 100,
+  repositories: 1,
+  contributorsAmount: 25,
+  stars: 10,
+  forks: 10,
+  languagesKnown: 50,
+  commits: 1,
+  lineOfCodes: 0.01,
+};

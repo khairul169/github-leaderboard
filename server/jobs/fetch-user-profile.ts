@@ -19,6 +19,7 @@ export const fetchUserProfile = async (data: FetchUserProfileType) => {
     .update(users)
     .set({
       name: details.name,
+      avatar: details.avatar,
       followers: details.followers,
       following: details.following,
       location: details.location,

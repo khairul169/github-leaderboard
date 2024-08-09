@@ -12,6 +12,9 @@ export const intval = (value: any) => {
 export const getLanguageLogo = (language: string) => {
   const alias: Record<string, string> = {
     gdscript: "godot",
+    gap: "godot",
+    html: "html5",
+    css: "css3",
   };
 
   let lang = language.toLowerCase().replace(/[^a-zA-Z]/g, "");

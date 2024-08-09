@@ -49,7 +49,8 @@ const RankListItem = ({
               "flex-1 truncate",
               idx === 0 && data.image
                 ? "flex flex-row items-center gap-x-2"
-                : ""
+                : "",
+              col.hideOnSmall && "hidden md:flex"
             )}
           >
             {idx === 0 && data.image ? (
@@ -78,7 +79,10 @@ export const RankListHeader = ({ columns }: RankListHeaderProps) => {
     <div className="flex flex-row items-center gap-x-2 w-full text-sm bg-base-300 text-base-content/80 p-4 py-2 mt-2 sticky z-[2] top-0 rounded-lg">
       <div className="w-10" />
       {columns.map((col, idx) => (
-        <p key={idx} className="flex-1">
+        <p
+          key={idx}
+          className={cn("flex-1", col.hideOnSmall && "hidden md:flex")}
+        >
           {col.title}
         </p>
       ))}

@@ -1,11 +1,11 @@
 import db from "@server/db";
 import { getLanguageLogo } from "@server/lib/utils";
-import { repositories, users } from "@server/models";
+import { repoLanguages, repositories, users } from "@server/models";
 import { count, desc, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export type GetLeaderboardRes = {
-  columns: { title: string; selector: string }[];
+  columns: { title: string; selector: string; hideOnSmall?: boolean }[];
   rows: {
     id?: string | null;
     rank: number;
@@ -48,12 +48,18 @@ export class LeaderboardRepository {
   async getTopLanguages() {
     const data = await db
       .select({
-        language: repositories.language,
+        language: repoLanguages.name,
         count: count(),
+        total: sql<number>`sum(${repoLanguages.percentage})`.as("total"),
+        avg: sql<number>`avg(${repoLanguages.percentage})`.as("avg"),
+        coverage: sql<number>`count(*) * avg(${repoLanguages.percentage})`.as(
+          "coverage"
+        ),
       })
       .from(repositories)
-      .groupBy(repositories.language)
-      .orderBy(desc(count()));
+      .innerJoin(repoLanguages, eq(repoLanguages.repoId, repositories.id))
+      .groupBy(repoLanguages.name)
+      .orderBy(desc(sql`count(*) * avg(${repoLanguages.percentage})`));
 
     const columns = [
       {
@@ -62,8 +68,21 @@ export class LeaderboardRepository {
       },
       {
         title: "Total Repo",
+        selector: "repo",
+      },
+      {
+        title: "Rerata",
+        selector: "avg",
+        hideOnSmall: true,
+      },
+      {
+        title: "Cakupan",
         selector: "sub",
       },
+      // {
+      //   title: "Total Persentase",
+      //   selector: "total",
+      // },
     ];
 
     const rows = data
@@ -71,8 +90,11 @@ export class LeaderboardRepository {
       .map((data, idx) => ({
         rank: idx + 1,
         name: data.language,
-        sub: `${data.count} repo`,
+        sub: data.coverage.toFixed(0),
         image: getLanguageLogo(data.language),
+        repo: `${data.count} repo`,
+        total: data.total,
+        avg: data.avg.toFixed(1),
       }));
 
     return { columns, rows } satisfies GetLeaderboardRes;
@@ -91,7 +113,8 @@ export class LeaderboardRepository {
       })
       .from(repositories)
       .innerJoin(users, eq(users.id, repositories.userId))
-      .where(inArray(sql`lower(${repositories.language})`, languages))
+      .innerJoin(repoLanguages, eq(repoLanguages.repoId, repositories.id))
+      .where(inArray(sql`lower(${repoLanguages.name})`, languages))
       .groupBy(users.id)
       .orderBy(desc(count()));
 
@@ -141,18 +164,18 @@ export class LeaderboardRepository {
       throw new HTTPException(404, { message: "User not found!" });
     }
 
-    const repos = await db
-      .select()
-      .from(repositories)
-      .where(eq(repositories.userId, user.id))
-      .orderBy(desc(repositories.stars), desc(repositories.forks));
+    const repos = await db.query.repositories.findMany({
+      where: eq(repositories.userId, user.id),
+      orderBy: [desc(repositories.stars), desc(repositories.forks)],
+      with: { languages: true },
+    });
 
     const languageMap: Record<string, number> = {};
     repos
       .flatMap((i) => i.languages || [])
       .forEach((i) => {
-        if (!languageMap[i.lang]) languageMap[i.lang] = 0;
-        languageMap[i.lang] += i.amount;
+        if (!languageMap[i.name]) languageMap[i.name] = 0;
+        languageMap[i.name] += i.percentage;
       });
 
     const totalLangWeight = Object.values(languageMap).reduce(

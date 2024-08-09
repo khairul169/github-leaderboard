@@ -1,3 +1,11 @@
+CREATE TABLE `repository_languages` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`repo_id` integer NOT NULL,
+	`name` text NOT NULL,
+	`percentage` real NOT NULL,
+	FOREIGN KEY (`repo_id`) REFERENCES `repositories`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `repositories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`user_id` integer NOT NULL,
@@ -7,7 +15,6 @@ CREATE TABLE `repositories` (
 	`stars` integer NOT NULL,
 	`forks` integer NOT NULL,
 	`last_update` text NOT NULL,
-	`languages` text,
 	`contributors` text,
 	`is_pending` integer DEFAULT false NOT NULL,
 	`is_error` integer DEFAULT false NOT NULL,
@@ -34,6 +41,7 @@ CREATE TABLE `users` (
 	`updated_at` text NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `repository_languages_name_idx` ON `repository_languages` (`name`);--> statement-breakpoint
 CREATE INDEX `repositories_name_idx` ON `repositories` (`name`);--> statement-breakpoint
 CREATE INDEX `repositories_uri_idx` ON `repositories` (`uri`);--> statement-breakpoint
 CREATE INDEX `repositories_language_idx` ON `repositories` (`language`);--> statement-breakpoint

@@ -8,6 +8,7 @@ const GITHUB_API_URL = "https://api.github.com";
 const selectors = {
   user: {
     name: "h1.vcard-names > span.vcard-fullname",
+    avatar: ".js-profile-editable-replace img.avatar-user",
     location: "li[itemprop='homeLocation'] span",
     followers: ".js-profile-editable-area a[href$='?tab=followers'] > span",
     following: ".js-profile-editable-area a[href$='?tab=following'] > span",
@@ -30,6 +31,8 @@ const github = {
     const $ = cheerio.load(response);
 
     const name = $(selectors.user.name).text().trim();
+    const avatar = $(selectors.user.avatar).attr("src");
+    console.log({ avatar });
     const location = $(selectors.user.location).text().trim();
     const followers = intval($(selectors.user.followers).text().trim());
     const following = intval($(selectors.user.following).text().trim());
@@ -43,6 +46,7 @@ const github = {
 
     return {
       name: name || username,
+      avatar,
       username,
       location,
       followers,
