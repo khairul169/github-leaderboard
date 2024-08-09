@@ -1,10 +1,13 @@
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "../models";
 
-const DATABASE_PATH = import.meta.env.DATABASE_PATH || "./data.db";
+const DATABASE_PATH = import.meta.env.DATABASE_PATH;
+if (!DATABASE_PATH) {
+  throw new Error("DATABASE_PATH is not set");
+}
 
-const sqlite = new Database(DATABASE_PATH);
-const db = drizzle(sqlite, { schema });
+const queryClient = postgres(DATABASE_PATH);
+const db = drizzle(queryClient, { schema });
 
 export default db;

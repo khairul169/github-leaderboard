@@ -1,23 +1,24 @@
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
-  text,
-  sqliteTable,
+  varchar,
+  serial,
+  pgTable,
   integer,
   index,
-  real,
-} from "drizzle-orm/sqlite-core";
+  doublePrecision,
+} from "drizzle-orm/pg-core";
 import { repositories } from "./repositories";
 
-export const repoLanguages = sqliteTable(
+export const repoLanguages = pgTable(
   "repository_languages",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     repoId: integer("repo_id")
       .notNull()
       .references(() => repositories.id),
 
-    name: text("name").notNull(),
-    percentage: real("percentage").notNull(),
+    name: varchar("name").notNull(),
+    percentage: doublePrecision("percentage").notNull(),
   },
   (t) => ({
     nameIdx: index("repository_languages_name_idx").on(t.name),

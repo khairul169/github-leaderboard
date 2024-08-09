@@ -5,37 +5,44 @@ import {
   relations,
   sql,
 } from "drizzle-orm";
-import { text, sqliteTable, integer, index } from "drizzle-orm/sqlite-core";
+import {
+  varchar,
+  pgTable,
+  integer,
+  index,
+  serial,
+  jsonb,
+  boolean,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { repoLanguages } from "./repo-languages";
 
-export const repositories = sqliteTable(
+export const repositories = pgTable(
   "repositories",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     userId: integer("user_id")
       .notNull()
       .references(() => users.id),
 
-    name: text("name").notNull(),
-    uri: text("uri").notNull(),
-    language: text("language").notNull(),
+    name: varchar("name").notNull(),
+    uri: varchar("uri").notNull(),
+    language: varchar("language").notNull(),
     stars: integer("stars").notNull(),
     forks: integer("forks").notNull(),
-    lastUpdate: text("last_update").notNull(),
-    contributors: text("contributors", { mode: "json" }).$type<Contributor[]>(),
+    lastUpdate: varchar("last_update").notNull(),
+    contributors: jsonb("contributors").$type<Contributor[]>(),
 
-    isPending: integer("is_pending", { mode: "boolean" })
-      .notNull()
-      .default(false),
-    isError: integer("is_error", { mode: "boolean" }).notNull().default(false),
+    isPending: boolean("is_pending").notNull().default(false),
+    isError: boolean("is_error").notNull().default(false),
 
-    createdAt: text("created_at")
+    createdAt: timestamp("created_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: text("updated_at")
+    updatedAt: timestamp("updated_at")
       .notNull()
-      .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+      .$onUpdate(() => new Date()),
   },
   (t) => ({
     nameIdx: index("repositories_name_idx").on(t.name),

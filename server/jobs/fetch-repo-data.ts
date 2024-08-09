@@ -61,5 +61,9 @@ export const fetchRepoData = async (data: FetchRepoDataJobType) => {
     }
   });
 
-  await queue.add("calculateUserPoints", { userId: repository.userId });
+  await queue.add(
+    "calculateUserPoints",
+    { userId: repository.userId },
+    { jobId: `calculateUserPoints:${repository.userId}` }
+  );
 };

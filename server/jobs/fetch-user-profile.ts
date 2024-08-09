@@ -27,5 +27,9 @@ export const fetchUserProfile = async (data: FetchUserProfileType) => {
     })
     .where(eq(users.id, user.id));
 
-  await queue.add("calculateUserPoints", { userId: user.id });
+  await queue.add(
+    "calculateUserPoints",
+    { userId: user.id },
+    { jobId: `calculateUserPoints:${user.id}` }
+  );
 };

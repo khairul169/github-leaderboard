@@ -22,13 +22,15 @@ export const fetchRepoContributors = async (
     throw new Error("Repository not found!");
   }
 
-  if (!repo.userAccessToken) {
+  const accessToken =
+    repo.userAccessToken || import.meta.env.GITHUB_DEFAULT_TOKEN;
+  if (!accessToken) {
     throw new Error("User access token not found!");
   }
 
   const contributors = await github.getRepoContributors(data.uri, {
     headers: {
-      Authorization: `Bearer ${repo.userAccessToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 
@@ -42,7 +44,11 @@ export const fetchRepoContributors = async (
     throw new Error("Cannot update repository!");
   }
 
-  await queue.add("calculateUserPoints", { userId: result.userId });
+  await queue.add(
+    "calculateUserPoints",
+    { userId: result.userId },
+    { jobId: `calculateUserPoints:${result.userId}` }
+  );
 };
 
 export const onFetchRepoContribFailed = async (

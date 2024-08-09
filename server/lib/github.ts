@@ -32,7 +32,6 @@ const github = {
 
     const name = $(selectors.user.name).text().trim();
     const avatar = $(selectors.user.avatar).attr("src");
-    console.log({ avatar });
     const location = $(selectors.user.location).text().trim();
     const followers = intval($(selectors.user.followers).text().trim());
     const following = intval($(selectors.user.following).text().trim());

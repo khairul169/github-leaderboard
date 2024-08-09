@@ -28,6 +28,7 @@
     "drizzle-orm": "^0.32.2",
     "hono": "^4.5.4",
     "pino": "^9.3.2",
+    "postgres": "^3.4.4",
     "react": "^18.3.1",
     "react-daisyui": "^5.0.3",
     "react-dom": "^18.3.1",

@@ -59,7 +59,8 @@ export class LeaderboardRepository {
       .from(repositories)
       .innerJoin(repoLanguages, eq(repoLanguages.repoId, repositories.id))
       .groupBy(repoLanguages.name)
-      .orderBy(desc(sql`count(*) * avg(${repoLanguages.percentage})`));
+      .orderBy(desc(sql`count(*) * avg(${repoLanguages.percentage})`))
+      .limit(20);
 
     const columns = [
       {
@@ -116,7 +117,8 @@ export class LeaderboardRepository {
       .innerJoin(repoLanguages, eq(repoLanguages.repoId, repositories.id))
       .where(inArray(sql`lower(${repoLanguages.name})`, languages))
       .groupBy(users.id)
-      .orderBy(desc(count()));
+      .orderBy(desc(count()))
+      .limit(100);
 
     const columns = [
       {
