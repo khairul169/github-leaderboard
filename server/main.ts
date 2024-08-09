@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { serveStatic } from "hono/bun";
 import router from "./router";
 import logger from "./lib/logger";
+import { logger as httpLogger } from "hono/logger";
 import { __DEV, __PROD } from "./lib/consts";
 
 const HOST = import.meta.env.HOST || "127.0.0.1";
@@ -25,7 +26,8 @@ app.get("/health", (c) => c.text("OK"));
 
 // Serve prod client app
 if (__PROD) {
-  app.use("*", serveStatic({ root: "./dist/client" }));
+  app.use(httpLogger());
+  app.use(serveStatic({ root: "./dist/client" }));
 }
 
 // API router
