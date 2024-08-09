@@ -61,8 +61,8 @@ export const fetchUserRepos = async (data: FetchUserRepos) => {
       name: "fetchRepoContributors",
       data,
       opts: {
-        attempts: 10,
-        backoff: { type: "exponential", delay: 10000 },
+        attempts: 5,
+        backoff: { type: "exponential", delay: 3000 },
         jobId: `contributors:${data.uri}`,
       },
     }))
